@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Lesion Detection System</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('/static/images/newimg.webp'), linear-gradient(to bottom, #f0f8ff, #e6f7ff);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* Container Styles */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        /* Heading Styles */
+        h1 {
+            color: #010c14;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Drag and Drop Styles */
+        #dropZone {
+            border: 2px dashed #0e1216;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        #dropZone:hover {
+            background: #e6f7ff;
+        }
+
+        #dropZone p {
+            margin: 0;
+            color: #555;
+            font-size: 16px;
+        }
+
+        /* Button Styles */
+        button {
+            background: #054a53;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: #106675;
+            transform: scale(1.05);
+        }
+
+        /* Result Section */
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result h2 {
+            color: #000203;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .result p {
+            margin: 5px 0;
+            font-family: 'Verdana', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #333;
+            font-size: 15px;
+            text-transform: capitalize;
+        }
+
+        /* Image Styles */
+        img {
+            max-width: 300px; /* Restricting the width of the uploaded image */
+            height: auto;
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #4d363f;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Skin Lesion Detection System</h1>
+        <div id="dropZone">
+            <p>Drag and drop your image here or click to select</p>
+        </div>
+        <form id="uploadForm">
+            <input type="file" id="fileInput" name="file" accept="image/*" style="display:none;">
+            <button type="submit">Analyze</button>
+        </form>
+        <div class="result" id="result">
+            <!-- Results will appear here -->
+        </div>
+        <div class="footer">
+            <p><b>Note: This system provides preliminary analysis. Always consult a dermatologist for confirmation.</b></p>
+        </div>
+    </div>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+        const resultDiv = document.getElementById('result');
+
+        // Handle drag-and-drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#e6f7ff';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = '#f9f9f9';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '#f9f9f9';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+            }
+        });
+
+        // Handle form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files[0]) {
+                alert("Please select an image file.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            resultDiv.innerHTML = "<p>Processing your image...</p>";
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <h2>Analysis Results:</h2>
+                        <img src="${data.image_path}" alt="Uploaded Skin Lesion">
+                        <p><span class="label">Predicted Class:</span> ${data.class}</p>
+                        <p><span class="label">Malignancy Status:</span> ${data.malignancy_status}</p>
+                        <p><span class="label">Confidence:</span> ${data.confidence}</p>
+                        <p><span class="label">Recommendation:</span> ${data.recommendation}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
