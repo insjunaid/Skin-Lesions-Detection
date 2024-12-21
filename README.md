@@ -1,5 +1,5 @@
 # Skin Lesions Detection Using Deep Learning
-
+![Screenshot 2024-12-21 233241](https://github.com/user-attachments/assets/66ad3f29-4c73-4af8-be6a-c7e166eb49a8)
 
 
 This repository contains a PyTorch-based implementation for detecting various types of skin lesions using a fine-tuned EfficientNet-B4 model. The project includes a Flask web application to upload skin lesion images and obtain predictions with recommendations for further action.
