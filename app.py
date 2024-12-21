@@ -4,6 +4,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 import os
 import uuid
+import numpy as np 
 
 app = Flask(__name__)
 
