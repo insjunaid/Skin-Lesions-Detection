@@ -1,6 +1,5 @@
 # Skin Lesions Detection Using Deep Learning
 
-![Screenshot 2024-12-19 004521](https://github.com/user-attachments/assets/da8226d4-2c15-409c-9b75-7040b7bb82b6)
 
 
 
@@ -95,7 +94,7 @@ The training data is augmented with transformations, including:
 
 The training script implements:
 
-- Early stopping with a patience of 6 epochs
+- Early stopping with a patience of 5 epochs
 - Weighted loss function to address class imbalance
 - Learning rate scheduler to reduce learning rate on plateau
 
